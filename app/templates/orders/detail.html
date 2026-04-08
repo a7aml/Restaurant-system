@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}تفاصيل الطلب #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-amber-800">طلب #{{ order.id }}</h1>
+        <a href="{{ url_for('orders.index') }}" class="text-amber-700 hover:underline">← العودة</a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-6 border border-amber-100 mb-4">
+        <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+            <div><span class="font-semibold">الطاولة:</span> {{ order.table.table_number }}</div>
+            <div><span class="font-semibold">المسؤول:</span> {{ order.user.username }}</div>
+            <div><span class="font-semibold">الوقت:</span> {{ order.created_at.strftime('%H:%M %d/%m/%Y') }}</div>
+            <div><span class="font-semibold">الإجمالي:</span> {{ order.total_price }} ر.س</div>
+            {% if order.notes %}
+            <div class="col-span-2"><span class="font-semibold">ملاحظات:</span> {{ order.notes }}</div>
+            {% endif %}
+        </div>
+
+        <h2 class="font-bold text-amber-700 mb-3 border-t pt-3">الأصناف</h2>
+        <table class="w-full text-sm">
+            <thead class="text-gray-600">
+                <tr>
+                    <th class="text-right pb-2">الصنف</th>
+                    <th class="text-right pb-2">الكمية</th>
+                    <th class="text-right pb-2">السعر</th>
+                    <th class="text-right pb-2">المجموع</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for oi in order.items %}
+                <tr class="border-t border-gray-50">
+                    <td class="py-2">{{ oi.menu_item.name_ar }}</td>
+                    <td class="py-2">{{ oi.quantity }}</td>
+                    <td class="py-2">{{ oi.unit_price }} ر.س</td>
+                    <td class="py-2">{{ (oi.unit_price * oi.quantity) | round(2) }} ر.س</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if order.status not in ('delivered', 'cancelled') %}
+    <div class="bg-white rounded-xl shadow p-6 border border-amber-100">
+        <h2 class="font-bold text-amber-700 mb-3">تحديث الحالة</h2>
+        <form method="POST" action="{{ url_for('orders.update_status', order_id=order.id) }}" class="flex gap-3 flex-wrap">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <select name="status" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                <option value="pending" {{ 'selected' if order.status == 'pending' }}>قيد الانتظار</option>
+                <option value="preparing" {{ 'selected' if order.status == 'preparing' }}>يُحضَّر</option>
+                <option value="ready" {{ 'selected' if order.status == 'ready' }}>جاهز</option>
+                <option value="delivered" {{ 'selected' if order.status == 'delivered' }}>تم التسليم</option>
+            </select>
+            <button type="submit" class="bg-amber-700 text-white font-bold px-4 py-2 rounded-lg hover:bg-amber-800 transition">تحديث</button>
+        </form>
+        <form method="POST" action="{{ url_for('orders.cancel', order_id=order.id) }}" class="mt-3"
+            onsubmit="return confirm('هل أنت متأكد من إلغاء هذا الطلب؟')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="bg-red-100 text-red-700 font-bold px-4 py-2 rounded-lg hover:bg-red-200 transition">إلغاء الطلب</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}قائمة الطعام{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-amber-800">قائمة الطعام</h1>
+    {% if current_user.role == 'admin' %}
+    <a href="{{ url_for('menu.create') }}"
+        class="bg-amber-700 text-white px-4 py-2 rounded-lg font-semibold hover:bg-amber-800 transition">
+        + إضافة صنف
+    </a>
+    {% endif %}
+</div>
+
+{% set categories = items | map(attribute='category') | unique | list %}
+{% for category in categories %}
+<div class="mb-8">
+    <h2 class="text-lg font-bold text-amber-700 mb-3 border-b-2 border-amber-200 pb-1">{{ category }}</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for item in items if item.category == category %}
+        <div class="bg-white rounded-xl shadow p-4 border border-amber-100">
+            {% if item.image_url %}
+            <img src="{{ item.image_url }}" alt="{{ item.name_ar }}" class="w-full h-40 object-cover rounded-lg mb-3">
+            {% endif %}
+            <h3 class="font-bold text-gray-800">{{ item.name_ar }}</h3>
+            <p class="text-sm text-gray-500">{{ item.name_en }}</p>
+            {% if item.description_ar %}
+            <p class="text-sm text-gray-600 mt-1">{{ item.description_ar }}</p>
+            {% endif %}
+            <p class="text-amber-700 font-bold mt-2">{{ item.price }} ر.س</p>
+            {% if current_user.role == 'admin' %}
+            <div class="flex gap-2 mt-3">
+                <a href="{{ url_for('menu.edit', item_id=item.id) }}"
+                    class="text-sm bg-amber-100 text-amber-800 px-3 py-1 rounded hover:bg-amber-200 transition">تعديل</a>
+                <form method="POST" action="{{ url_for('menu.delete', item_id=item.id) }}"
+                    onsubmit="return confirm('هل أنت متأكد من حذف هذا الصنف؟')">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit"
+                        class="text-sm bg-red-100 text-red-700 px-3 py-1 rounded hover:bg-red-200 transition">حذف</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<p class="text-gray-500 text-center py-10">لا توجد أصناف في القائمة حالياً.</p>
+{% endfor %}
+{% endblock %}

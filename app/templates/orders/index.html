@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}الطلبات{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-amber-800">الطلبات</h1>
+    <a href="{{ url_for('orders.create') }}"
+        class="bg-amber-700 text-white px-4 py-2 rounded-lg font-semibold hover:bg-amber-800 transition">
+        + طلب جديد
+    </a>
+</div>
+
+{% if orders %}
+<div class="bg-white rounded-xl shadow overflow-hidden border border-amber-100">
+    <table class="w-full text-sm">
+        <thead class="bg-amber-100 text-amber-800 font-bold">
+            <tr>
+                <th class="px-4 py-3 text-right">رقم الطلب</th>
+                <th class="px-4 py-3 text-right">الطاولة</th>
+                <th class="px-4 py-3 text-right">الحالة</th>
+                <th class="px-4 py-3 text-right">الإجمالي</th>
+                <th class="px-4 py-3 text-right">الوقت</th>
+                <th class="px-4 py-3 text-right">إجراء</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr class="border-t border-gray-100 hover:bg-amber-50">
+                <td class="px-4 py-3">#{{ order.id }}</td>
+                <td class="px-4 py-3">طاولة {{ order.table.table_number }}</td>
+                <td class="px-4 py-3">
+                    <span class="px-2 py-1 rounded-full text-xs font-semibold
+                        {% if order.status == 'pending' %} bg-yellow-100 text-yellow-800
+                        {% elif order.status == 'preparing' %} bg-blue-100 text-blue-800
+                        {% elif order.status == 'ready' %} bg-green-100 text-green-800
+                        {% elif order.status == 'delivered' %} bg-gray-100 text-gray-600
+                        {% else %} bg-red-100 text-red-700 {% endif %}">
+                        {% if order.status == 'pending' %}قيد الانتظار
+                        {% elif order.status == 'preparing' %}يُحضَّر
+                        {% elif order.status == 'ready' %}جاهز
+                        {% elif order.status == 'delivered' %}تم التسليم
+                        {% else %}ملغي{% endif %}
+                    </span>
+                </td>
+                <td class="px-4 py-3">{{ order.total_price }} ر.س</td>
+                <td class="px-4 py-3 text-gray-500">{{ order.created_at.strftime('%H:%M %d/%m') }}</td>
+                <td class="px-4 py-3">
+                    <a href="{{ url_for('orders.detail', order_id=order.id) }}"
+                        class="text-amber-700 hover:underline font-semibold">عرض</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<p class="text-gray-500 text-center py-16">لا توجد طلبات حالياً.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'تعديل صنف' if item else 'إضافة صنف' }}{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto">
+    <h1 class="text-2xl font-bold text-amber-800 mb-6">{{ 'تعديل صنف' if item else 'إضافة صنف جديد' }}</h1>
+    <div class="bg-white rounded-2xl shadow-lg p-8 border border-amber-100">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-1">الاسم بالعربية</label>
+                    <input type="text" name="name_ar" value="{{ item.name_ar if item else '' }}" required
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">الاسم بالإنجليزية</label>
+                    <input type="text" name="name_en" value="{{ item.name_en if item else '' }}" required
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1">الوصف بالعربية</label>
+                <textarea name="description_ar" rows="2"
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400">{{ item.description_ar if item else '' }}</textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1">الوصف بالإنجليزية</label>
+                <textarea name="description_en" rows="2"
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400">{{ item.description_en if item else '' }}</textarea>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-1">السعر</label>
+                    <input type="number" name="price" step="0.01" min="0" value="{{ item.price if item else '' }}" required
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1">الفئة</label>
+                    <input type="text" name="category" value="{{ item.category if item else '' }}" required
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1">رابط الصورة</label>
+                <input type="text" name="image_url" value="{{ item.image_url if item else '' }}"
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400">
+            </div>
+            {% if item %}
+            <div class="mb-6 flex items-center gap-2">
+                <input type="checkbox" name="is_available" id="is_available" {{ 'checked' if item.is_available }}>
+                <label for="is_available" class="text-sm font-semibold">متاح للطلب</label>
+            </div>
+            {% endif %}
+            <div class="flex gap-3">
+                <button type="submit"
+                    class="bg-amber-700 text-white font-bold px-6 py-2 rounded-lg hover:bg-amber-800 transition">
+                    {{ 'تحديث' if item else 'إضافة' }}
+                </button>
+                <a href="{{ url_for('menu.index') }}"
+                    class="bg-gray-200 text-gray-700 font-bold px-6 py-2 rounded-lg hover:bg-gray-300 transition">
+                    إلغاء
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

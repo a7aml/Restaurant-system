@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'تعديل طاولة' if table else 'إضافة طاولة' }}{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto">
+    <h1 class="text-2xl font-bold text-amber-800 mb-6">{{ 'تعديل طاولة' if table else 'إضافة طاولة جديدة' }}</h1>
+    <div class="bg-white rounded-2xl shadow-lg p-8 border border-amber-100">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1">رقم الطاولة</label>
+                <input type="number" name="table_number" min="1" value="{{ table.table_number if table else '' }}" required
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1">السعة</label>
+                <input type="number" name="capacity" min="1" value="{{ table.capacity if table else '' }}" required
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400">
+            </div>
+            {% if table %}
+            <div class="mb-6">
+                <label class="block text-sm font-semibold mb-1">الحالة</label>
+                <select name="status" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    <option value="available" {{ 'selected' if table.status == 'available' }}>متاحة</option>
+                    <option value="occupied" {{ 'selected' if table.status == 'occupied' }}>مشغولة</option>
+                    <option value="reserved" {{ 'selected' if table.status == 'reserved' }}>محجوزة</option>
+                </select>
+            </div>
+            {% endif %}
+            <div class="flex gap-3">
+                <button type="submit"
+                    class="bg-amber-700 text-white font-bold px-6 py-2 rounded-lg hover:bg-amber-800 transition">
+                    {{ 'تحديث' if table else 'إضافة' }}
+                </button>
+                <a href="{{ url_for('tables.index') }}"
+                    class="bg-gray-200 text-gray-700 font-bold px-6 py-2 rounded-lg hover:bg-gray-300 transition">
+                    إلغاء
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

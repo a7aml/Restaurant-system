@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}طلب جديد{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <h1 class="text-2xl font-bold text-amber-800 mb-6">إنشاء طلب جديد</h1>
+    <div class="bg-white rounded-2xl shadow-lg p-8 border border-amber-100">
+        <form method="POST" action="{{ url_for('orders.create') }}" id="orderForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1">الطاولة</label>
+                <select name="table_id" required
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    <option value="">-- اختر الطاولة --</option>
+                    {% for table in tables %}
+                    <option value="{{ table.id }}">طاولة {{ table.table_number }} (سعة {{ table.capacity }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1">الأصناف</label>
+                <div class="space-y-2 max-h-64 overflow-y-auto border rounded-lg p-3">
+                    {% for item in items %}
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" name="item_ids" value="{{ item.id }}" id="item_{{ item.id }}"
+                            class="item-checkbox" data-item-id="{{ item.id }}">
+                        <label for="item_{{ item.id }}" class="flex-1 text-sm">
+                            {{ item.name_ar }} — {{ item.price }} ر.س
+                        </label>
+                        <input type="number" name="quantities" value="1" min="1" max="99"
+                            id="qty_{{ item.id }}"
+                            class="w-16 border border-gray-300 rounded px-2 py-1 text-sm">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-semibold mb-1">ملاحظات</label>
+                <textarea name="notes" rows="2"
+                    class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400"></textarea>
+            </div>
+
+            <div class="flex gap-3">
+                <button type="submit"
+                    class="bg-amber-700 text-white font-bold px-6 py-2 rounded-lg hover:bg-amber-800 transition">
+                    إنشاء الطلب
+                </button>
+                <a href="{{ url_for('orders.index') }}"
+                    class="bg-gray-200 text-gray-700 font-bold px-6 py-2 rounded-lg hover:bg-gray-300 transition">
+                    إلغاء
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

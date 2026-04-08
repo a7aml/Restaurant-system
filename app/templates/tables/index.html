@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}الطاولات{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-amber-800">الطاولات</h1>
+    {% if current_user.role == 'admin' %}
+    <a href="{{ url_for('tables.create') }}"
+        class="bg-amber-700 text-white px-4 py-2 rounded-lg font-semibold hover:bg-amber-800 transition">
+        + إضافة طاولة
+    </a>
+    {% endif %}
+</div>
+
+{% if tables %}
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+    {% for table in tables %}
+    <div class="bg-white rounded-xl shadow p-5 border text-center
+        {% if table.status == 'available' %} border-green-200
+        {% elif table.status == 'occupied' %} border-red-200
+        {% else %} border-yellow-200 {% endif %}">
+        <div class="text-3xl mb-2">🪑</div>
+        <h3 class="font-bold text-lg">طاولة {{ table.table_number }}</h3>
+        <p class="text-sm text-gray-500">سعة {{ table.capacity }}</p>
+        <span class="mt-2 inline-block px-3 py-1 rounded-full text-xs font-semibold
+            {% if table.status == 'available' %} bg-green-100 text-green-700
+            {% elif table.status == 'occupied' %} bg-red-100 text-red-700
+            {% else %} bg-yellow-100 text-yellow-700 {% endif %}">
+            {% if table.status == 'available' %}متاحة
+            {% elif table.status == 'occupied' %}مشغولة
+            {% else %}محجوزة{% endif %}
+        </span>
+        {% if current_user.role == 'admin' %}
+        <div class="flex justify-center gap-2 mt-3">
+            <a href="{{ url_for('tables.edit', table_id=table.id) }}"
+                class="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded hover:bg-amber-200 transition">تعديل</a>
+            <form method="POST" action="{{ url_for('tables.delete', table_id=table.id) }}"
+                onsubmit="return confirm('هل أنت متأكد من حذف هذه الطاولة؟')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit"
+                    class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200 transition">حذف</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-gray-500 text-center py-16">لا توجد طاولات مسجلة.</p>
+{% endif %}
+{% endblock %}
